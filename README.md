@@ -171,7 +171,11 @@ concept-learning-kit/
 | `gh: command not found` | 本机未安装 GitHub CLI | 不依赖 `gh`，改用 Git 命令 + GitHub REST API 创建仓库 |
 | `ssh: connect to host github.com port 22: Connection refused` | 网络环境封禁 22 端口 | 放弃 SSH 协议，改用 HTTPS（443）推送 |
 | 无 GitHub 凭据 | 本机未配置令牌 | 由本人在 GitHub 生成只勾选 `repo` 权限的 PAT，通过 HTTPS 一次性完成推送，用后立即在 GitHub 端吊销 |
-| `Resource not accessible by personal access token`（创建仓库返回 403） | 首次提供的是 **fine-grained PAT**（`github_pat_` 开头）：这类令牌创建仓库需要额外的 Administration 权限，且其 Repository access 若设为「Only select repositories」，连已有仓库都列不出来（`GET /user/repos` 返回空） | 改用 **classic PAT**（`ghp_` 开头，勾选 `repo`）一步到位；或重新生成 fine-grained 并设为 **All repositories** + **Contents: Read and write** + **Administration: Read and write** |
+| `Resource not accessible by personal access token`（创建仓库返回 403） | 首次提供的是 **fine-grained PAT**（`github_pat_` 开头）：这类令牌创建仓库需要额外的 Administration 权限，且其 Repository access 若设为「Only select repositories」，连已有仓库都列不出来（`GET /user/repos` 返回空） | 改用 **classic PAT**（`ghp_` 开头，勾选 `repo`）一步到位；或重新生成 fine-grained 并设为 **All repositories** + **Contents: Read and write** + **Administration: Read and write**。已确认：改用 classic PAT 后仓库创建成功 |
+| `git push` 连接 `github.com:443` 超时（`Failed to connect ... Timed out`，约 21 秒后失败） | 本机 DNS（192.168.199.254）把 `github.com` 解析到不可达的 IP `20.205.243.166`；实测同域名的 `140.82.113.3`、`140.82.113.4` 返回 200，`api.github.com` 也正常——说明是个别 IP 被阻断，不是整站不通。SSH 的 `ssh.github.com:443` 也可连通（但本机公钥未登记到 GitHub） | 尝试 `git -c http.curloptResolve=github.com:443:140.82.113.3` 未能生效（Git 侧静默退出）。最终**改用 GitHub REST API 的 Git Data API 上传提交**：逐个本地提交创建 blob → tree → commit，并保留原始 author/committer 与提交信息，最后 `PATCH /git/refs/heads/main` |
+| `Git Repository is empty`（Git Data API 返回 409） | 通过 API 新建的仓库是完全空的，此时 Git Data API 拒绝创建任何对象 | 先用 **Contents API** 建一个初始化提交把仓库激活，再用 Git Data API 写入真实历史，最后把 `refs/heads/main` 强制指向真实提交（初始化提交不进入最终历史） |
+
+> 说明：由于本地 `git` 无法直连 `github.com`，本次推送**未使用 `git push`**，而是通过 GitHub REST API 完成。远端提交的内容、顺序与提交信息与本地 5 次提交一一对应；因 API 生成的 commit 对象时间戳与本地不同，两边的 commit SHA 不一致。**远程仓库为权威版本**，本地仓库仅作存档；若日后本机网络恢复，建议重新 `git clone` 后再继续提交。
 
 ---
 
