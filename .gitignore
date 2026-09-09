@@ -1,0 +1,50 @@
+# ---------- 敏感信息：绝不提交 ----------
+# 环境变量与密钥文件
+.env
+.env.*
+*.env
+.env.local
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+*.token
+*_token.txt
+# 常见云平台 / AI 服务凭据
+credentials.json
+service-account*.json
+.aws/credentials
+.secret*
+secret*/ 
+*.secret
+
+# ---------- 隐私内容 ----------
+# 个人笔记草稿、成绩、身份证号等可能含隐私的临时文件
+private/
+personal/
+*.private.md
+TODO-private.md
+
+# ---------- 系统与编辑器 ----------
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+*.code-workspace
+
+# ---------- 依赖与构建产物 ----------
+node_modules/
+__pycache__/
+*.pyc
+dist/
+build/
+.venv/
+venv/
+
+# ---------- 日志 ----------
+*.log
+npm-debug.log*
