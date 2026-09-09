@@ -171,6 +171,7 @@ concept-learning-kit/
 | `gh: command not found` | 本机未安装 GitHub CLI | 不依赖 `gh`，改用 Git 命令 + GitHub REST API 创建仓库 |
 | `ssh: connect to host github.com port 22: Connection refused` | 网络环境封禁 22 端口 | 放弃 SSH 协议，改用 HTTPS（443）推送 |
 | 无 GitHub 凭据 | 本机未配置令牌 | 由本人在 GitHub 生成只勾选 `repo` 权限的 PAT，通过 HTTPS 一次性完成推送，用后立即在 GitHub 端吊销 |
+| `Resource not accessible by personal access token`（创建仓库返回 403） | 首次提供的是 **fine-grained PAT**（`github_pat_` 开头）：这类令牌创建仓库需要额外的 Administration 权限，且其 Repository access 若设为「Only select repositories」，连已有仓库都列不出来（`GET /user/repos` 返回空） | 改用 **classic PAT**（`ghp_` 开头，勾选 `repo`）一步到位；或重新生成 fine-grained 并设为 **All repositories** + **Contents: Read and write** + **Administration: Read and write** |
 
 ---
 
