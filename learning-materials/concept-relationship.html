@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>概念关系说明：Agent × 上下文 × Skill</title>
+<style>
+  :root{
+    --bg:#ffffff; --card:#f7f8fa; --primary:#2c5aa0; --primary-soft:#eaf0f9;
+    --text:#1f2328; --muted:#57606a; --border:#d8dee4; --warn:#b35900; --warn-bg:#fff8e6;
+    --skill:#2c5aa0; --ctx:#b35900; --agent:#2f7a3e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    font-size:15.5px;line-height:1.75;}
+  .wrap{max-width:880px;margin:0 auto;padding:32px 24px 80px;}
+  header.top{border-bottom:3px solid var(--primary);padding-bottom:18px;margin-bottom:8px;}
+  h1{font-size:26px;margin:0 0 10px;color:var(--primary);}
+  .lead{font-size:16.5px;background:var(--primary-soft);border-left:4px solid var(--primary);
+    padding:12px 16px;border-radius:0 6px 6px 0;margin:10px 0 0;}
+  h2{font-size:20px;color:var(--primary);border-bottom:1px solid var(--border);
+    padding-bottom:8px;margin:38px 0 14px;}
+  h3{font-size:16px;margin:22px 0 8px;}
+  p{margin:10px 0;} ul,ol{margin:10px 0;padding-left:24px;} li{margin:6px 0;}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px;}
+  th{background:var(--primary-soft);color:var(--primary);text-align:left;
+    padding:9px 11px;border:1px solid var(--border);font-weight:600;}
+  td{padding:9px 11px;border:1px solid var(--border);vertical-align:top;}
+  tr:nth-child(even) td{background:#fcfcfd;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin:14px 0;}
+  .mine{background:#f0f7f0;border-left:4px solid #2f7a3e;border-radius:0 8px 8px 0;padding:14px 18px;margin:14px 0;}
+  .mine h3{margin-top:0;color:#2f7a3e;}
+  code{background:#eef1f4;padding:2px 6px;border-radius:4px;font-size:13.5px;
+    font-family:"SFMono-Regular",Consolas,monospace;}
+  pre{background:#f7f8fa;border:1px solid var(--border);border-radius:8px;
+    padding:14px 16px;overflow-x:auto;font-size:13.5px;}
+  a{color:var(--primary);text-decoration:underline;}
+  figure{margin:18px 0;text-align:center;}
+  figcaption{font-size:13px;color:var(--muted);margin-top:8px;}
+  .memo{background:#fff8e6;border:1px solid #f0d8a8;border-radius:8px;padding:16px 18px;
+    font-size:16px;margin:20px 0;}
+  footer{margin-top:50px;padding-top:16px;border-top:1px solid var(--border);
+    font-size:13.5px;color:var(--muted);}
+  @media print{body{font-size:12pt}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>概念关系说明：Agent × 上下文 × Skill</h1>
+  <p class="lead">Agent 是干活的主体，上下文是它此刻能看到的全部信息，Skill 是它按需取用的经验手册。三者构成一个闭环。</p>
+</header>
+
+<p style="color:var(--muted);font-size:14px">
+  配套学习资料：<a href="./agent.html">Agent</a> · <a href="./llm-context.html">大模型的上下文</a> · <a href="./skill.html">Skill</a>
+  ｜ 完整文字版见仓库 <code>docs/concept-relationship.md</code>
+</p>
+
+<h2>1. 三者分别回答什么问题</h2>
+<table>
+  <tr><th style="width:110px">概念</th><th style="width:150px">回答的问题</th><th>本质</th><th style="width:150px">存在形态</th></tr>
+  <tr><td><strong>Agent</strong></td><td>谁来把这件事做完？</td><td>一种<strong>系统结构</strong>：模型 + 工具 + 循环 + 反馈</td><td>运行时的执行循环</td></tr>
+  <tr><td><strong>上下文</strong></td><td>它此刻能看到什么？</td><td>一种<strong>有限资源</strong>：本次调用的输入 token 集合</td><td>每次 API 调用的输入</td></tr>
+  <tr><td><strong>Skill</strong></td><td>它凭什么做得专业？</td><td>一种<strong>知识封装</strong>：文件夹 + 元数据 + 指令 + 脚本</td><td>文件系统上的静态文件</td></tr>
+</table>
+<p>值得注意：三者的<strong>存在形态完全不同</strong>——一个是运行时循环，一个是每次调用的输入，一个是磁盘上的文件。它们不在同一个层面，这也是很多人把它们混为一谈的原因。</p>
+
+<h2>2. 关系全景图</h2>
+<figure>
+  <svg viewBox="0 0 860 460" width="100%" role="img" aria-label="Agent、上下文、Skill 三者关系闭环图">
+    <defs>
+      <marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#57606a"/>
+      </marker>
+    </defs>
+
+    <!-- Skill -->
+    <rect x="30" y="30" width="230" height="86" rx="10" fill="#eaf0f9" stroke="#2c5aa0" stroke-width="2"/>
+    <text x="145" y="60" text-anchor="middle" font-size="16" fill="#2c5aa0" font-weight="600" font-family="sans-serif">Skill</text>
+    <text x="145" y="82" text-anchor="middle" font-size="12.5" fill="#1f2328" font-family="sans-serif">沉淀的任务知识</text>
+    <text x="145" y="100" text-anchor="middle" font-size="12" fill="#57606a" font-family="sans-serif">文件系统上的静态文件</text>
+
+    <!-- Context -->
+    <rect x="320" y="30" width="230" height="86" rx="10" fill="#fff8e6" stroke="#b35900" stroke-width="2"/>
+    <text x="435" y="60" text-anchor="middle" font-size="16" fill="#b35900" font-weight="600" font-family="sans-serif">上下文</text>
+    <text x="435" y="82" text-anchor="middle" font-size="12.5" fill="#1f2328" font-family="sans-serif">本次可见的 token 集合</text>
+    <text x="435" y="100" text-anchor="middle" font-size="12" fill="#57606a" font-family="sans-serif">有限、边际收益递减</text>
+
+    <!-- Agent -->
+    <rect x="610" y="30" width="230" height="86" rx="10" fill="#f0f7f0" stroke="#2f7a3e" stroke-width="2"/>
+    <text x="725" y="60" text-anchor="middle" font-size="16" fill="#2f7a3e" font-weight="600" font-family="sans-serif">Agent</text>
+    <text x="725" y="82" text-anchor="middle" font-size="12.5" fill="#1f2328" font-family="sans-serif">思考—行动—观察 循环</text>
+    <text x="725" y="100" text-anchor="middle" font-size="12" fill="#57606a" font-family="sans-serif">模型 + 工具 + 反馈</text>
+
+    <!-- 环境 -->
+    <rect x="610" y="200" width="230" height="76" rx="10" fill="#f7f8fa" stroke="#d8dee4" stroke-width="1.5"/>
+    <text x="725" y="228" text-anchor="middle" font-size="14" fill="#1f2328" font-family="sans-serif">工具返回 / 环境反馈</text>
+    <text x="725" y="250" text-anchor="middle" font-size="12" fill="#57606a" font-family="sans-serif">ground truth（搜索结果、报错、文件内容）</text>
+
+    <!-- 交付物 -->
+    <rect x="320" y="320" width="230" height="70" rx="10" fill="#f7f8fa" stroke="#d8dee4" stroke-width="1.5"/>
+    <text x="435" y="350" text-anchor="middle" font-size="14" fill="#1f2328" font-family="sans-serif">交付物 / 任务结果</text>
+    <text x="435" y="370" text-anchor="middle" font-size="12" fill="#57606a" font-family="sans-serif">本次作业的三份学习资料</text>
+
+    <!-- 箭头 -->
+    <line x1="262" y1="73" x2="315" y2="73" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <text x="288" y="64" text-anchor="middle" font-size="12" fill="#2c5aa0" font-family="sans-serif">①</text>
+    <text x="288" y="92" text-anchor="middle" font-size="10.5" fill="#57606a" font-family="sans-serif">触发加载</text>
+
+    <line x1="552" y1="73" x2="605" y2="73" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <text x="578" y="64" text-anchor="middle" font-size="12" fill="#b35900" font-family="sans-serif">③</text>
+    <text x="578" y="92" text-anchor="middle" font-size="10.5" fill="#57606a" font-family="sans-serif">决定判断</text>
+
+    <line x1="725" y1="118" x2="725" y2="195" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <text x="740" y="160" font-size="12" fill="#2f7a3e" font-family="sans-serif">④ 调用工具</text>
+
+    <path d="M 606 238 L 560 238 L 560 100 L 552 100" fill="none" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <text x="500" y="228" font-size="12" fill="#b35900" font-family="sans-serif">② 执行结果写回</text>
+
+    <path d="M 560 355 L 725 355 L 725 285" fill="none" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <text x="640" y="348" font-size="12" fill="#57606a" font-family="sans-serif">⑤ 产出</text>
+
+    <path d="M 318 355 L 145 355 L 145 122" fill="none" stroke="#2f7a3e" stroke-width="2"
+          stroke-dasharray="7,4" marker-end="url(#a)"/>
+    <text x="150" y="345" font-size="12" fill="#2f7a3e" font-family="sans-serif">⑥ 复盘后固化（提交 Git）</text>
+
+    <path d="M 60 122 L 60 150 L 100 150 L 100 100 L 108 100" fill="none" stroke="#b35900"
+          stroke-width="1.8" stroke-dasharray="5,4" marker-end="url(#a)"/>
+    <text x="30" y="166" font-size="11" fill="#b35900" font-family="sans-serif">⑦ 压缩 / 清理</text>
+
+    <rect x="30" y="215" width="230" height="180" rx="10" fill="#fcfcfd" stroke="#d8dee4"/>
+    <text x="46" y="240" font-size="13" fill="#2c5aa0" font-weight="600" font-family="sans-serif">关键机制对照</text>
+    <text x="46" y="264" font-size="12" fill="#1f2328" font-family="sans-serif">Skill：三级渐进式披露</text>
+    <text x="46" y="282" font-size="11.5" fill="#57606a" font-family="sans-serif">  元数据常驻 / 正文命中才读 / 脚本只执行</text>
+    <text x="46" y="306" font-size="12" fill="#1f2328" font-family="sans-serif">上下文：四种管理手段</text>
+    <text x="46" y="324" font-size="11.5" fill="#57606a" font-family="sans-serif">  按需加载 / 压缩 / 外部笔记 / 子智能体</text>
+    <text x="46" y="348" font-size="12" fill="#1f2328" font-family="sans-serif">Agent：循环 + 停止条件</text>
+    <text x="46" y="366" font-size="11.5" fill="#57606a" font-family="sans-serif">  每步拿 ground truth，靠护栏控制成本与错误</text>
+  </svg>
+  <figcaption>图：三者的闭环关系。Skill 决定「什么知识在什么时刻进入上下文」，上下文决定「Agent 这一步判断有多好」，Agent 的产出最终又沉淀回 Skill。</figcaption>
+</figure>
+
+<h2>3. 上下文如何影响 Agent 的工作</h2>
+<p>这是三条关系里最容易被低估的一条——<strong>上下文不是 Agent 的背景板，而是它的能力边界</strong>。</p>
+
+<h3>3.1 决定 Agent 知道什么</h3>
+<p>Agent 没有独立于上下文的记忆。它每一步能依据的，只有当前上下文里摆着的东西。上下文里没有的信息，对 Agent 而言等同于不存在。所以换一个更长的窗口不等于让它更聪明，但<strong>在正确时刻塞进正确的信息，判断质量会立刻提升</strong>。</p>
+
+<h3>3.2 决定 Agent 注意什么</h3>
+<p>由于注意力的 n² 压力与 context rot 的存在，堆在上下文里的低信号内容会挤占高信号内容的注意力。对 Agent 的直接影响是：随着循环轮数增加，工具返回的原始结果不断累积，模型反而容易忽略最初的任务目标。这就是长任务 Agent 必须做压缩的原因——<strong>首先不是为了省 token，而是为了不让 Agent 失焦</strong>。</p>
+
+<h3>3.3 决定 Agent 能跑多久</h3>
+<table>
+  <tr><th style="width:150px">管理手段</th><th>解决的问题</th><th>对 Agent 的意义</th></tr>
+  <tr><td>按需加载</td><td>避免一开始就撑满</td><td>能启动，且上下文保持高信号</td></tr>
+  <tr><td>压缩</td><td>长度随轮次增长</td><td>能跑得久</td></tr>
+  <tr><td>外部笔记</td><td>跨轮次保留关键信息</td><td>能保持目标感，不半途忘掉初衷</td></tr>
+  <tr><td>子智能体</td><td>隔离探索过程的污染</td><td>主上下文只留结论，专注综合判断</td></tr>
+</table>
+
+<h2>4. Skill 如何沉淀可复用的任务知识</h2>
+
+<h3>沉淀的是什么</h3>
+<p>Agent 有智力和工具，但缺<strong>领域专长</strong>——也就是「这件事的正确做法」。Skill 沉淀的正是这部分，而且不止「怎么做」，还包括<strong>「什么时候做」和「做到什么程度算合格」</strong>。我的 concept-study-guide 里就同时写了这三层：适用场景、生成步骤、自检清单。少任何一层，复用时都会出问题。</p>
+
+<h3>为什么能沉淀很多却不拖累 Agent</h3>
+<table>
+  <tr><th style="width:110px">级别</th><th>内容</th><th>加载时机</th><th>上下文开销</th></tr>
+  <tr><td>L1 元数据</td><td>name + description</td><td>始终</td><td>每个约 50–100 tokens</td></tr>
+  <tr><td>L2 指令正文</td><td>SKILL.md 主体</td><td>匹配命中后</td><td>建议 &lt; 5k tokens</td></tr>
+  <tr><td>L3 资源与代码</td><td>参考文档、脚本、模板</td><td>被引用时</td><td>脚本可执行、不必读入</td></tr>
+</table>
+<p><strong>这是 Skill 与「把长指令写进项目说明文件」的根本区别</strong>：后者常驻上下文，写多少占多少；Skill 平时只占几十个 token。所以一个 Agent 可以装备几百个 Skill 而不影响性能——<strong>知识可以无限沉淀，代价却按需支付</strong>。</p>
+
+<h3>沉淀是一个闭环</h3>
+<pre>做任务 → 发现反复交代同样的要求 → 抽成 Skill → 用几次发现问题 → 改 SKILL.md → 提交 Git → 下次自动生效</pre>
+<p>这条最有价值的地方在于：上下文会清空，模型权重不会因为你改了个流程而改变，<strong>但 Skill 会</strong>。它是 Agent 时代少数能让「经验」真正跨会话累积的机制。</p>
+
+<h2>5. 用本次作业走一遍闭环</h2>
+<table>
+  <tr><th style="width:60px">阶段</th><th>发生了什么</th><th style="width:150px">对应概念</th></tr>
+  <tr><td>1</td><td>创建 concept-learning-kit 仓库，git init</td><td>—</td></tr>
+  <tr><td>2</td><td>把「怎么学一个概念」写成 <code>.workbuddy/skills/concept-study-guide/SKILL.md</code></td><td><strong>Skill</strong>（方法固化成文件）</td></tr>
+  <tr><td>3</td><td>说「用 concept-study-guide 学 Agent」，模型读到 description 匹配成功，把正文读进上下文</td><td><strong>Skill → 上下文</strong>（①）</td></tr>
+  <tr><td>4</td><td>按步骤检索来源、搭骨架、生成 HTML；期间用搜索工具找来源、用命令验证链接</td><td><strong>上下文 → Agent → 工具</strong>（③④）</td></tr>
+  <tr><td>5</td><td>验证链接返回 200/404、curl 报「端口 22 被拒」，结果进入上下文，模型据此改用 HTTPS</td><td><strong>环境 → 上下文</strong>（②）</td></tr>
+  <tr><td>6</td><td>三份 HTML 交付；把「来源必须验证」写进 Skill 自检清单，提交 Git</td><td><strong>交付物 → Skill</strong>（⑥）</td></tr>
+</table>
+<p>最直观的一点：<strong>同一个模型，因为上下文里多了一份 SKILL.md，产出从「一段解释」变成了「一份结构完整、带来源、带自测题的学习资料」。</strong>模型没变，变的是上下文；而让上下文变好的，是 Skill。</p>
+
+<h2>6. 我的判断</h2>
+<div class="mine">
+  <ol>
+    <li><strong>上下文工程比提示词工程更接近 Agent 开发的核心</strong>，因为表现上限取决于每一步看到什么。但要知道「哪些内容值得进来」，恰恰需要 Skill 提供——所以我认为 <strong>Skill 是上下文工程的关键抓手</strong>。</li>
+    <li><strong>三者的重要性随任务复杂度变化。</strong>简单任务里 Skill 作用最大；长任务里上下文管理会迅速超过一切——跑不完的任务，方法再好也没用。所以不存在「哪个更重要」的静态答案。</li>
+    <li><strong>Agent 与 Workflow 的二分法在实践中是模糊的</strong>，真实产品几乎都是混合体。这个划分更适合作为设计时的思考工具，而非贴标签的分类标准。</li>
+    <li><strong>Skill 目前最大的短板是触发不可控</strong>，完全依赖 description 的语义匹配。（这是我自己的推测，无官方资料支持。）未来可能需要更结构化的触发条件。</li>
+  </ol>
+</div>
+
+<div class="memo">
+  <strong>一句话记忆法：</strong>Agent 是工人，上下文是他的工作台，Skill 是书架上的手册。工作台大小有限，不能什么都往上堆；手册可以放几百本，因为只有需要时才抽出来翻；而工人干活的经验，最后又会写回手册里。
+</div>
+
+<footer>
+  作者：楼欣钰　｜　整理日期：2026-09-09　｜　文字版：<code>docs/concept-relationship.md</code><br>
+  本页为 <code>docs/concept-relationship.md</code> 的可视化版本，内容一致，图形为手绘 SVG（无外部依赖，可离线打开）。
+</footer>
+
+</div>
+</body>
+</html>

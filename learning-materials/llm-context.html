@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>概念学习资料：大模型的上下文（Context）</title>
+<style>
+  :root{
+    --bg:#ffffff; --card:#f7f8fa; --primary:#2c5aa0; --primary-soft:#eaf0f9;
+    --text:#1f2328; --muted:#57606a; --border:#d8dee4; --warn:#b35900; --warn-bg:#fff8e6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    font-size:15.5px;line-height:1.75;}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 24px 80px;}
+  header.top{border-bottom:3px solid var(--primary);padding-bottom:18px;margin-bottom:8px;}
+  h1{font-size:27px;margin:0 0 10px;color:var(--primary);}
+  .def{font-size:17px;background:var(--primary-soft);border-left:4px solid var(--primary);
+    padding:12px 16px;border-radius:0 6px 6px 0;margin:10px 0 0;}
+  .notice{background:var(--warn-bg);border:1px solid #f0d8a8;border-radius:6px;
+    padding:10px 14px;font-size:14px;color:var(--warn);margin:18px 0;}
+  nav.toc{background:var(--card);border:1px solid var(--border);border-radius:8px;
+    padding:14px 18px;margin:22px 0 30px;}
+  nav.toc strong{color:var(--primary);}
+  nav.toc a{color:var(--text);text-decoration:none;margin:0 10px 0 0;font-size:14px;white-space:nowrap;}
+  nav.toc a:hover{color:var(--primary);text-decoration:underline;}
+  section{margin:0 0 34px;}
+  h2{font-size:20px;color:var(--primary);border-bottom:1px solid var(--border);
+    padding-bottom:8px;margin:38px 0 14px;}
+  h3{font-size:16px;margin:20px 0 8px;}
+  p{margin:10px 0;} ul,ol{margin:10px 0;padding-left:24px;} li{margin:6px 0;}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px;}
+  th{background:var(--primary-soft);color:var(--primary);text-align:left;
+    padding:9px 11px;border:1px solid var(--border);font-weight:600;}
+  td{padding:9px 11px;border:1px solid var(--border);vertical-align:top;}
+  tr:nth-child(even) td{background:#fcfcfd;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin:14px 0;}
+  .mine{background:#f0f7f0;border-left:4px solid #2f7a3e;border-radius:0 8px 8px 0;padding:14px 18px;margin:14px 0;}
+  .mine h3{margin-top:0;color:#2f7a3e;}
+  code{background:#eef1f4;padding:2px 6px;border-radius:4px;font-size:13.5px;
+    font-family:"SFMono-Regular",Consolas,monospace;}
+  a{color:var(--primary);text-decoration:underline;}
+  figure{margin:16px 0;text-align:center;}
+  figcaption{font-size:13px;color:var(--muted);margin-top:8px;}
+  details{background:var(--card);border:1px solid var(--border);border-radius:6px;
+    padding:10px 14px;margin:8px 0;}
+  summary{cursor:pointer;font-weight:600;}
+  .tag{display:inline-block;background:var(--primary-soft);color:var(--primary);
+    border-radius:4px;padding:1px 8px;font-size:12.5px;margin-right:6px;}
+  .doubt{background:#fdf3f3;border-left:4px solid #c0392b;border-radius:0 8px 8px 0;padding:14px 18px;}
+  footer{margin-top:50px;padding-top:16px;border-top:1px solid var(--border);
+    font-size:13.5px;color:var(--muted);}
+  @media print{nav.toc{display:none}details{display:block}
+    details summary{display:none}body{font-size:12pt}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>大模型的上下文（Context）</h1>
+  <p class="def">一句话定义：模型在生成下一个字时，能「看见」的全部内容——它不是聊天的背景板，而是一份需要精打细算的有限预算。</p>
+</header>
+
+<p class="notice">本资料由 AI 生成初稿，经本人逐条核查与改写后定稿。所有来源链接均已实际访问确认。核查与修改记录见仓库 README。</p>
+
+<nav class="toc">
+  <strong>目录：</strong>
+  <a href="#card">档案卡</a><a href="#goal">学习目标</a><a href="#question">核心问题</a>
+  <a href="#mechanism">核心机制</a><a href="#model">心智模型</a><a href="#mine">我的理解</a>
+  <a href="#scenario">应用场景</a><a href="#boundary">易混淆与边界</a>
+  <a href="#quiz">自测</a><a href="#sources">来源</a><a href="#doubt">存疑点</a>
+</nav>
+
+<section id="card">
+  <h2>学习档案卡</h2>
+  <table>
+    <tr><th style="width:120px">概念</th><td>大模型的上下文（Context / Context Window）</td></tr>
+    <tr><th>所属领域</th><td>大模型推理机制 / 上下文工程（Context Engineering）</td></tr>
+    <tr><th>我的起点</th><td>知道有「上下文长度」这个参数，以为它只是「能聊多长」，不清楚它具体装了哪些东西，也不明白为什么长上下文不等于效果好</td></tr>
+    <tr><th>学习深度</th><td>标准</td></tr>
+    <tr><th>预计耗时</th><td>45 分钟（含自测）</td></tr>
+    <tr><th>生成日期</th><td>2026-09-09</td></tr>
+  </table>
+</section>
+
+<section id="goal">
+  <h2>1. 学习目标</h2>
+  <ol>
+    <li>能列举一次 LLM 调用中上下文包含的至少 5 类内容。</li>
+    <li>能解释为什么上下文是「边际收益递减的有限资源」，并说出至少两条架构层面的原因。</li>
+    <li>能针对一个长任务，说出压缩、按需加载、外部笔记、子智能体这四种策略各自的适用场景。</li>
+  </ol>
+</section>
+
+<section id="question">
+  <h2>2. 核心问题</h2>
+  <ul>
+    <li>上下文窗口从 4K 涨到几十万 token，为什么「塞满」仍然是坏做法？</li>
+    <li>「上下文工程」和「提示词工程」到底差在哪？是换了个说法吗？</li>
+    <li>对话历史被压缩或截断时，丢掉的是什么？模型会「忘记」吗？</li>
+  </ul>
+</section>
+
+<section id="mechanism">
+  <h2>3. 核心机制与组成</h2>
+
+  <h3>3.1 上下文里到底装了什么</h3>
+  <p>Anthropic 对上下文的定义是：<strong>从大模型采样时所包含的那组 token</strong>。按 Claude 官方课程的拆解，一次请求里模型能看到的包括：</p>
+  <table>
+    <tr><th style="width:150px">组成</th><th>说明</th><th style="width:110px">谁把它放进去的</th></tr>
+    <tr><td>系统提示</td><td>角色设定、规则、输出格式要求</td><td>开发者（固定）</td></tr>
+    <tr><td>对话历史</td><td>之前所有轮次的 user / assistant 消息</td><td>累积</td></tr>
+    <tr><td>工具定义</td><td>可用工具的 schema 与说明，本身就占 token</td><td>开发者（固定）</td></tr>
+    <tr><td>工具返回结果</td><td>搜索结果、文件读取内容、命令输出</td><td>运行时</td></tr>
+    <tr><td>外部数据 / 检索结果</td><td>RAG 召回的文档片段</td><td>运行时</td></tr>
+    <tr><td>附件与 Skill 内容</td><td>上传的文件、被触发时加载的 SKILL.md</td><td>按需</td></tr>
+    <tr><td>思考块（thinking）</td><td>模型自身的推理过程（部分产品可见）</td><td>模型</td></tr>
+  </table>
+  <p>关键点：<strong>上下文是「每一次 API 调用的输入」，进去收费、出来也收费</strong>。它不是一份持久化的档案。</p>
+
+  <h3>3.2 为什么上下文是稀缺资源</h3>
+  <p>Anthropic 在《Effective context engineering for AI agents》里给了两条架构层面的原因：</p>
+  <ol>
+    <li><strong>注意力的 n² 压力</strong>：Transformer 架构让每个 token 都能关注到其他所有 token，n 个 token 产生 n² 组成对关系。上下文越长，模型捕捉这些关系的能力被摊得越薄。</li>
+    <li><strong>训练分布偏向短序列</strong>：模型在训练时见到的短序列远多于长序列，因此对「跨越整段上下文的依赖关系」经验更少、专用参数更少。位置编码插值等技术能支持更长序列，但会牺牲一部分位置理解精度。</li>
+  </ol>
+  <p>结果是所谓 <strong>context rot（上下文腐烂）</strong>：随着上下文 token 数增加，模型准确回忆其中信息的能力下降。这是<strong>性能梯度，不是硬悬崖</strong>——模型在长上下文下依然能干活，只是检索精度和长程推理的可靠度下降。</p>
+
+  <figure>
+    <svg viewBox="0 0 860 250" width="100%" role="img" aria-label="上下文管理与性能梯度示意图">
+      <defs>
+        <marker id="ar2" markerWidth="10" markerHeight="10" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#2c5aa0"/>
+        </marker>
+      </defs>
+      <text x="20" y="24" font-size="13" fill="#57606a" font-family="sans-serif">模型准确回忆信息的能力</text>
+      <line x1="20" y1="200" x2="560" y2="200" stroke="#1f2328" stroke-width="1.5"/>
+      <line x1="20" y1="200" x2="20" y2="35" stroke="#1f2328" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <text x="230" y="230" font-size="13" fill="#57606a" font-family="sans-serif">上下文 token 数 →</text>
+      <path d="M 30 70 C 200 75, 330 120, 540 165" fill="none" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="7,4"/>
+      <text x="120" y="60" font-size="13" fill="#c0392b" font-family="sans-serif">context rot：性能梯度式下降（非悬崖）</text>
+      <text x="470" y="185" font-size="12" fill="#57606a" font-family="sans-serif">窗口上限</text>
+      <line x1="540" y1="200" x2="540" y2="40" stroke="#b35900" stroke-width="1.5" stroke-dasharray="5,4"/>
+      <text x="548" y="55" font-size="12" fill="#b35900" font-family="sans-serif">满了请求直接失败</text>
+
+      <rect x="600" y="40" width="240" height="180" rx="8" fill="#f7f8fa" stroke="#d8dee4"/>
+      <text x="720" y="66" text-anchor="middle" font-size="14" fill="#2c5aa0" font-family="sans-serif" font-weight="600">四种应对策略</text>
+      <text x="614" y="96" font-size="13" fill="#1f2328" font-family="sans-serif">① 按需加载：只放当前需要的</text>
+      <text x="614" y="126" font-size="13" fill="#1f2328" font-family="sans-serif">② 压缩：历史轮次摘要化</text>
+      <text x="614" y="156" font-size="13" fill="#1f2328" font-family="sans-serif">③ 外部笔记：写到窗口之外</text>
+      <text x="614" y="186" font-size="13" fill="#1f2328" font-family="sans-serif">④ 子智能体：隔离再汇总</text>
+    </svg>
+    <figcaption>图 2：上下文越长，信息召回能力越是「缓坡下滑」而非突然崩塌；右侧是 Claude 官方课程归纳的四种管理手段。</figcaption>
+  </figure>
+
+  <h3>3.3 从提示词工程到上下文工程</h3>
+  <p>Anthropic 的表述是：上下文工程是提示词工程的自然演进。差别在于——提示词工程关注<strong>怎么写好一段提示（尤其是系统提示）</strong>，是一次性的离散任务；上下文工程关注<strong>在推理全程持续策展最优 token 集合</strong>，是每次决定「给模型看什么」时都要做的迭代动作。它管理的范围包括系统指令、工具、MCP、外部数据、消息历史等所有可能落进上下文的东西。</p>
+  <p>指导原则一句话：<strong>用尽可能小的高信号 token 集合，最大化达成期望结果的概率。</strong></p>
+</section>
+
+<section id="model">
+  <h2>4. 最小心智模型</h2>
+  <div class="card">
+    <p><strong>类比：上下文是工人的「工作台」，不是他的「仓库」。</strong></p>
+    <p>工人一次能摊开在工作台上的图纸、零件和便签是有限的。台面堆得越满，他找东西越慢、越容易拿错零件；真要用某个零件，正确做法是<strong>需要时再从仓库取</strong>，而不是一开始就把整个仓库倒上台面。</p>
+    <p>而且下班时工作台会被清空——明天开工，台面上什么都没有。这就是为什么 Agent 需要「外部记忆」这类机制。</p>
+  </div>
+</section>
+
+<section id="mine">
+  <h2>5. 我的理解</h2>
+  <div class="mine">
+    <h3>（本人改写，非 AI 原文）</h3>
+    <p><strong>类比：</strong>上下文像模型的「当下视野」，记忆才是它的「履历」。一个人视野里能同时盯住的东西有限，视野边缘的东西他会看见但看不真切；而他昨天做过什么，靠的是记事本，不是靠此刻的视野。</p>
+    <p><strong>大白话：</strong>上下文 = 这一次调用时，摆在模型面前的全部文字。它决定了模型「此刻知道什么」，也直接决定了你要花多少钱、等多久。</p>
+    <p><strong>它其实不是：</strong></p>
+    <ul>
+      <li>不是「窗口越大越好」。窗口大只是「不容易直接失败」，不等于「信息都被有效利用」。堆满低信号内容反而会稀释注意力，这就是 context rot。</li>
+      <li>不是「聊天记录 = 记忆」。对话历史超出窗口后会被压缩或截断，被压缩掉的部分模型是真的看不到了。要跨会话保留信息，必须写进外部存储（文件、数据库、memory 工具）。</li>
+      <li>不是免费的资源。每一个 token 都要付钱、都要占用延迟，稳定的大块内容（系统提示、工具定义）值得用 prompt caching 复用。</li>
+      <li>不是「提示词换个说法」。提示词关心措辞，上下文工程关心<strong>取舍</strong>——放什么、不放什么、什么时候放。我觉得这个区分是本篇最有价值的一点。</li>
+    </ul>
+  </div>
+</section>
+
+<section id="scenario">
+  <h2>6. 具体应用场景</h2>
+  <h3>场景：长任务编码 Agent 的上下文管理</h3>
+  <p>Claude 官方课程给出的例子是<strong>合规审查 Agent</strong>：它不会把整本建筑规范塞进系统提示，而是在需要某一条时调用 <code>lookup_building_code</code> 工具去查。这就是四种策略里的「按需加载 / just-in-time」。</p>
+  <table>
+    <tr><th style="width:130px">维度</th><th>内容</th></tr>
+    <tr><td>谁在用</td><td>需要连续工作几十分钟到数小时的 Agent 产品（编码、研究、运维）</td></tr>
+    <tr><td>具体怎么用</td><td>项目说明文件（如 CLAUDE.md）常驻系统提示；具体文件内容用 glob / grep 在需要时才读取；对话接近窗口上限时自动压缩历史；跨会话的用户偏好写入 memory 目录</td></tr>
+    <tr><td>为什么非它不可</td><td>Agent 跑得越久，产生的数据越多（工具结果、报错、历史轮次），<strong>全量保留必然撑爆窗口</strong>；而一旦窗口满了请求直接失败，任务前功尽弃</td></tr>
+    <tr><td>效果怎么衡量</td><td>任务完成率、平均 token 消耗、缓存命中率、压缩后关键信息的保留率</td></tr>
+  </table>
+  <p><strong>我自己的一个实例：</strong>这个仓库里的 <code>SKILL.md</code> 只有在被触发时才会被读进上下文，平时模型只知道它的 name 和 description（约几十个 token）。这正是「渐进式披露」——需要时才把细节搬上工作台。如果我一次性把十几个 Skill 的全文都塞进去，上下文会立刻被无关内容占满。</p>
+</section>
+
+<section id="boundary">
+  <h2>7. 易混淆概念与使用边界</h2>
+  <table>
+    <tr><th style="width:110px">混淆对象</th><th>表面相似点</th><th>本质区别</th><th>判断口诀</th></tr>
+    <tr>
+      <td><strong>上下文 vs 记忆</strong></td>
+      <td>都关系到模型「知道什么」</td>
+      <td>上下文是单次调用的输入，用完即走；记忆是写在窗口之外的持久化存储，需要时再取回</td>
+      <td>问：会话结束后它还在吗？不在就是上下文</td>
+    </tr>
+    <tr>
+      <td><strong>上下文工程 vs 提示词工程</strong></td>
+      <td>都在优化模型的输入</td>
+      <td>提示词工程关注「怎么写好这段指令」（离散任务）；上下文工程关注「全程维持最优 token 集合」（迭代策展），范围含工具、历史、外部数据</td>
+      <td>问：你改的是措辞，还是改的是「放什么进来」？</td>
+    </tr>
+    <tr>
+      <td><strong>长上下文 vs RAG</strong></td>
+      <td>都用于让模型接触外部知识</td>
+      <td>长上下文是把材料全放进窗口；RAG 是检索出最相关的片段再放。前者成本高且受 context rot 影响，后者更省但依赖检索质量</td>
+      <td>不是二选一，而是「按需加载」往往更划算</td>
+    </tr>
+    <tr>
+      <td><strong>上下文 vs 模型知识</strong></td>
+      <td>都能让模型答对问题</td>
+      <td>上下文里的信息是当次提供的；模型知识来自训练参数。放进上下文不等于模型「学会了」</td>
+      <td>下次新会话它还记得吗？不记得说明只是上下文</td>
+    </tr>
+  </table>
+
+  <h3>使用边界（不该怎么做）</h3>
+  <ol>
+    <li><strong>不要把整个知识库塞进窗口。</strong>成本、延迟、context rot 三重代价，回报却是递减的。</li>
+    <li><strong>不要用长上下文替代检索。</strong>窗口大是兜底能力，不是让它当数据库用。</li>
+    <li><strong>不要忽视缓存。</strong>系统提示和工具定义这类稳定大块内容应该被缓存复用，否则每次调用重复付费。</li>
+    <li><strong>不要把敏感信息随手放进上下文。</strong>上下文内容会被模型看到，也可能进入日志；密钥、密码、个人信息都不该出现在里面。</li>
+    <li><strong>不要指望模型自己「记住」被压缩掉的内容。</strong>压缩是有损的，真正重要的信息要显式写进外部笔记。</li>
+  </ol>
+</section>
+
+<section id="quiz">
+  <h2>8. 自测题（5 题）</h2>
+  <details><summary>Q1（定义）列出一次 LLM 调用中上下文包含的五类内容。</summary>
+    <p><strong>判分要点：</strong>系统提示、对话历史、工具定义、工具返回结果、外部/检索数据、附件与 Skill 内容、思考块——答出任意五类即可。只答「聊天记录」不给满分。</p></details>
+  <details><summary>Q2（机制）为什么上下文变长后，模型表现会下降？说出两条架构层面的原因。</summary>
+    <p><strong>判分要点：</strong>① Transformer 的 n² 成对关注关系被摊薄；② 训练数据中短序列占多数，模型对长程依赖经验不足（位置编码插值也带来位置理解损失）。答出任一得一半，答全满分。</p></details>
+  <details><summary>Q3（机制）context rot 是「硬悬崖」还是「性能梯度」？这个区别有什么实践意义？</summary>
+    <p><strong>判分要点：</strong>是性能梯度——模型在长上下文下仍可用，只是检索精度和长程推理可靠性下降。实践意义：不能因为「窗口没满」就放心堆料；也不能把长上下文当成不可用，而应配合策展策略使用。</p></details>
+  <details><summary>Q4（边界）有人说「等模型支持 1000 万 token 上下文，RAG 就没用了」，你怎么回应？</summary>
+    <p><strong>判分要点：</strong>不认同。窗口大小解决的是「能不能装下」，RAG / 按需加载解决的是「该不该装进去」——成本、延迟、context rot 都随长度恶化。而且窗口满了请求直接失败，不代表装得越多效果越好。能说出「最小高信号 token 集合」原则即可。</p></details>
+  <details><summary>Q5（迁移）你正在做一个要跑 2 小时的 Agent，列出你会采用哪几种上下文管理策略，以及各自的理由。</summary>
+    <p><strong>判分要点：</strong>开放题。合格标准：至少提到按需加载（避免塞满）、压缩（应对长度增长）、外部笔记（跨轮次保留关键信息）、子智能体隔离（控制主上下文污染）中的两项，并说明对应解决的是成本、窗口还是记忆问题。</p></details>
+</section>
+
+<section id="sources">
+  <h2>9. 可核查来源</h2>
+  <table>
+    <tr><th style="width:24%">标题</th><th>链接</th><th style="width:10%">类型</th><th>支撑了哪句话</th><th style="width:8%">已核实</th></tr>
+    <tr>
+      <td>Effective context engineering for AI agents（Anthropic 工程博客）</td>
+      <td><a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents" target="_blank" rel="noopener">anthropic.com/engineering/effective-context-engineering-for-ai-agents</a></td>
+      <td><span class="tag">一手</span></td>
+      <td>上下文定义；n² 注意力压力与训练分布偏短；context rot 与「性能梯度非硬悬崖」；上下文工程 vs 提示词工程；最小高信号 token 原则</td>
+      <td>是（2026-09-09 访问，HTTP 200）</td>
+    </tr>
+    <tr>
+      <td>Context management（Claude Academy 官方课程）</td>
+      <td><a href="https://academy.claude.com/courses/claude-platform-101/context-management" target="_blank" rel="noopener">academy.claude.com/courses/claude-platform-101/context-management</a></td>
+      <td><span class="tag">一手</span></td>
+      <td>上下文的七类组成；窗口满了请求失败；合规审查 Agent 的按需加载例子；四种管理策略</td>
+      <td>是（2026-09-09 访问）</td>
+    </tr>
+    <tr>
+      <td>Lost in the Middle: How Language Models Use Long Contexts（arXiv:2307.03172）</td>
+      <td><a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">arxiv.org/abs/2307.03172</a></td>
+      <td><span class="tag">一手论文</span></td>
+      <td>长上下文中信息位置对利用效果的影响（开头/结尾优于中部），是 context rot 的经验证据之一</td>
+      <td>是（2026-09-09 访问，HTTP 200）</td>
+    </tr>
+    <tr>
+      <td>Prompt caching（Anthropic 官方文档）</td>
+      <td><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching" target="_blank" rel="noopener">docs.anthropic.com/en/docs/build-with-claude/prompt-caching</a></td>
+      <td><span class="tag">一手</span></td>
+      <td>「稳定大块内容应缓存复用」这一实践建议</td>
+      <td>是（2026-09-09 访问，HTTP 200）</td>
+    </tr>
+  </table>
+</section>
+
+<section id="doubt">
+  <h2>10. 我的存疑点</h2>
+  <div class="doubt">
+    <ul>
+      <li><strong>context rot 的量化阈值我还没找到。</strong>Anthropic 只说「所有模型都有这个特性，只是斜率不同」，没有给出「多少 token 之后明显恶化」的通用数字。我猜这个阈值高度依赖任务类型（检索 vs 推理）和内容密度，不能一概而论。</li>
+      <li><strong>压缩（compaction）到底丢了什么，很难验证。</strong>官方文档建议「先最大化召回，再迭代提升精确度」，但实际操作中没有客观指标判断某次压缩是否丢掉了后面要用到的关键信息。这是我觉得上下文工程里最工程化、也最依赖经验的一环。</li>
+      <li><strong>「上下文」这个词本身有歧义。</strong>它有时指 context window（容量上限），有时指当次输入的内容，有时在语言学里指语境。读中文资料时经常混淆，我在本资料里统一取「当次调用的输入 token 集合」这一含义。</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  生成工具：concept-study-guide（本人自建的项目级 Skill，位于 <code>.workbuddy/skills/concept-study-guide/</code>）<br>
+  流程：AI 初稿 → 本人逐条核对来源链接 → 改写「我的理解」与「存疑点」 → 定稿
+</footer>
+
+</div>
+</body>
+</html>

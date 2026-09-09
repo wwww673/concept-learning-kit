@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>概念学习资料：Skill（技能）</title>
+<style>
+  :root{
+    --bg:#ffffff; --card:#f7f8fa; --primary:#2c5aa0; --primary-soft:#eaf0f9;
+    --text:#1f2328; --muted:#57606a; --border:#d8dee4; --warn:#b35900; --warn-bg:#fff8e6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    font-size:15.5px;line-height:1.75;}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 24px 80px;}
+  header.top{border-bottom:3px solid var(--primary);padding-bottom:18px;margin-bottom:8px;}
+  h1{font-size:27px;margin:0 0 10px;color:var(--primary);}
+  .def{font-size:17px;background:var(--primary-soft);border-left:4px solid var(--primary);
+    padding:12px 16px;border-radius:0 6px 6px 0;margin:10px 0 0;}
+  .notice{background:var(--warn-bg);border:1px solid #f0d8a8;border-radius:6px;
+    padding:10px 14px;font-size:14px;color:var(--warn);margin:18px 0;}
+  nav.toc{background:var(--card);border:1px solid var(--border);border-radius:8px;
+    padding:14px 18px;margin:22px 0 30px;}
+  nav.toc strong{color:var(--primary);}
+  nav.toc a{color:var(--text);text-decoration:none;margin:0 10px 0 0;font-size:14px;white-space:nowrap;}
+  nav.toc a:hover{color:var(--primary);text-decoration:underline;}
+  section{margin:0 0 34px;}
+  h2{font-size:20px;color:var(--primary);border-bottom:1px solid var(--border);
+    padding-bottom:8px;margin:38px 0 14px;}
+  h3{font-size:16px;margin:20px 0 8px;}
+  p{margin:10px 0;} ul,ol{margin:10px 0;padding-left:24px;} li{margin:6px 0;}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px;}
+  th{background:var(--primary-soft);color:var(--primary);text-align:left;
+    padding:9px 11px;border:1px solid var(--border);font-weight:600;}
+  td{padding:9px 11px;border:1px solid var(--border);vertical-align:top;}
+  tr:nth-child(even) td{background:#fcfcfd;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin:14px 0;}
+  .mine{background:#f0f7f0;border-left:4px solid #2f7a3e;border-radius:0 8px 8px 0;padding:14px 18px;margin:14px 0;}
+  .mine h3{margin-top:0;color:#2f7a3e;}
+  code{background:#eef1f4;padding:2px 6px;border-radius:4px;font-size:13.5px;
+    font-family:"SFMono-Regular",Consolas,monospace;}
+  pre{background:#f7f8fa;border:1px solid var(--border);border-radius:8px;
+    padding:14px 16px;overflow-x:auto;font-size:13.5px;line-height:1.6;}
+  pre code{background:none;padding:0;}
+  a{color:var(--primary);text-decoration:underline;}
+  figure{margin:16px 0;text-align:center;}
+  figcaption{font-size:13px;color:var(--muted);margin-top:8px;}
+  details{background:var(--card);border:1px solid var(--border);border-radius:6px;
+    padding:10px 14px;margin:8px 0;}
+  summary{cursor:pointer;font-weight:600;}
+  .tag{display:inline-block;background:var(--primary-soft);color:var(--primary);
+    border-radius:4px;padding:1px 8px;font-size:12.5px;margin-right:6px;}
+  .doubt{background:#fdf3f3;border-left:4px solid #c0392b;border-radius:0 8px 8px 0;padding:14px 18px;}
+  footer{margin-top:50px;padding-top:16px;border-top:1px solid var(--border);
+    font-size:13.5px;color:var(--muted);}
+  @media print{nav.toc{display:none}details{display:block}
+    details summary{display:none}body{font-size:12pt}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>Skill（技能）</h1>
+  <p class="def">一句话定义：一个装着指令、脚本和资料的文件夹，让通用 Agent 在需要时按需取用，从而变成某个领域的熟手。</p>
+</header>
+
+<p class="notice">本资料由 AI 生成初稿，经本人逐条核查与改写后定稿。所有来源链接均已实际访问确认。核查与修改记录见仓库 README。</p>
+
+<nav class="toc">
+  <strong>目录：</strong>
+  <a href="#card">档案卡</a><a href="#goal">学习目标</a><a href="#question">核心问题</a>
+  <a href="#mechanism">核心机制</a><a href="#model">心智模型</a><a href="#mine">我的理解</a>
+  <a href="#scenario">应用场景</a><a href="#boundary">易混淆与边界</a>
+  <a href="#quiz">自测</a><a href="#sources">来源</a><a href="#doubt">存疑点</a>
+</nav>
+
+<section id="card">
+  <h2>学习档案卡</h2>
+  <table>
+    <tr><th style="width:120px">概念</th><td>Skill（Agent Skills / 技能）</td></tr>
+    <tr><th>所属领域</th><td>Agent 能力扩展 / 知识工程（Knowledge Packaging）</td></tr>
+    <tr><th>我的起点</th><td>知道提示词和 MCP，但分不清 Skill 和「写一段提示词存起来」有什么本质区别，也不知道它为什么要用文件夹而不是一段文字</td></tr>
+    <tr><th>学习深度</th><td>标准</td></tr>
+    <tr><th>预计耗时</th><td>40 分钟（含自测）</td></tr>
+    <tr><th>生成日期</th><td>2026-09-09</td></tr>
+  </table>
+</section>
+
+<section id="goal">
+  <h2>1. 学习目标</h2>
+  <ol>
+    <li>能写出一个合规的 SKILL.md（含 YAML frontmatter 与正文），并说清 name / description 各自的作用。</li>
+    <li>能解释「渐进式披露」的三级加载机制，并说明它如何节省上下文。</li>
+    <li>能判断一个工作流该封装成 Skill、还是写进 CLAUDE.md 或直接提问。</li>
+  </ol>
+</section>
+
+<section id="question">
+  <h2>2. 核心问题</h2>
+  <ul>
+    <li>为什么要做成文件夹，而不是一段更长的提示词？</li>
+    <li>装了几百个 Skill，为什么不会撑爆上下文？</li>
+    <li>Skill 和 MCP 都在「扩展 Agent 能力」，它们的分工到底是什么？</li>
+  </ul>
+</section>
+
+<section id="mechanism">
+  <h2>3. 核心机制与组成</h2>
+
+  <h3>3.1 一个 Skill 长什么样</h3>
+  <p>Anthropic 官方定义：Skill 是<strong>模块化能力</strong>，每个 Skill 打包了指令、元数据和可选资源（脚本、模板），Claude 在相关时自动使用。最小形态就是一个目录加一个 <code>SKILL.md</code>：</p>
+  <pre><code>my-skill/
+├── SKILL.md          # 必需：YAML 元数据 + Markdown 正文
+├── REFERENCE.md      # 可选：详细参考，按需才读
+├── FORMS.md          # 可选：特定场景的补充指南
+└── scripts/
+    └── helper.py     # 可选：可执行脚本，运行它不等于读它</code></pre>
+
+  <p>SKILL.md 由两部分组成：</p>
+  <pre><code>---
+name: concept-study-guide
+description: 为一个新概念生成结构化的个人学习资料……当用户说"学习某个概念"时使用。
+---
+
+# 正文
+## 适用场景
+## 输入信息
+## 生成步骤
+……</code></pre>
+
+  <p>两个字段各司其职：<code>name</code> 决定它叫什么（也是调用时的命令名），<code>description</code> <strong>决定它什么时候被触发</strong>——模型启动时只看得到这两个字段，然后拿它们跟当前任务做语义匹配。所以 description 写不好，Skill 就永远不会被用上。这是官方文档反复强调的一点。</p>
+
+  <h3>3.2 三级渐进式披露</h3>
+  <figure>
+    <svg viewBox="0 0 860 300" width="100%" role="img" aria-label="Skill 三级渐进式披露示意图">
+      <defs>
+        <marker id="ar3" markerWidth="10" markerHeight="10" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#2c5aa0"/>
+        </marker>
+      </defs>
+      <rect x="20" y="30" width="250" height="90" rx="8" fill="#eaf0f9" stroke="#2c5aa0" stroke-width="1.5"/>
+      <text x="145" y="58" text-anchor="middle" font-size="14" fill="#2c5aa0" font-family="sans-serif" font-weight="600">Level 1 · 元数据</text>
+      <text x="145" y="80" text-anchor="middle" font-size="12.5" fill="#1f2328" font-family="sans-serif">name + description</text>
+      <text x="145" y="100" text-anchor="middle" font-size="12.5" fill="#2f7a3e" font-family="sans-serif">始终加载 · 约 50–100 tokens</text>
+
+      <rect x="305" y="30" width="250" height="90" rx="8" fill="#eaf0f9" stroke="#2c5aa0" stroke-width="1.5"/>
+      <text x="430" y="58" text-anchor="middle" font-size="14" fill="#2c5aa0" font-family="sans-serif" font-weight="600">Level 2 · 指令正文</text>
+      <text x="430" y="80" text-anchor="middle" font-size="12.5" fill="#1f2328" font-family="sans-serif">SKILL.md 的完整内容</text>
+      <text x="430" y="100" text-anchor="middle" font-size="12.5" fill="#b35900" font-family="sans-serif">匹配命中才加载 · 建议 &lt; 5k tokens</text>
+
+      <rect x="590" y="30" width="250" height="90" rx="8" fill="#eaf0f9" stroke="#2c5aa0" stroke-width="1.5"/>
+      <text x="715" y="58" text-anchor="middle" font-size="14" fill="#2c5aa0" font-family="sans-serif" font-weight="600">Level 3 · 资源与代码</text>
+      <text x="715" y="80" text-anchor="middle" font-size="12.5" fill="#1f2328" font-family="sans-serif">REFERENCE.md / scripts / 模板</text>
+      <text x="715" y="100" text-anchor="middle" font-size="12.5" fill="#2f7a3e" font-family="sans-serif">被引用时才读 · 脚本执行不占上下文</text>
+
+      <line x1="270" y1="75" x2="300" y2="75" stroke="#2c5aa0" stroke-width="2" marker-end="url(#ar3)"/>
+      <line x1="555" y1="75" x2="585" y2="75" stroke="#2c5aa0" stroke-width="2" marker-end="url(#ar3)"/>
+      <text x="285" y="68" font-size="11" fill="#57606a" font-family="sans-serif">命中</text>
+
+      <rect x="20" y="170" width="820" height="100" rx="8" fill="#f7f8fa" stroke="#d8dee4"/>
+      <text x="40" y="196" font-size="13.5" fill="#1f2328" font-family="sans-serif" font-weight="600">为什么这个设计重要：</text>
+      <text x="40" y="220" font-size="13" fill="#1f2328" font-family="sans-serif">装 100 个 Skill，平时只占 100 × 约 100 tokens 的元数据开销；真正干活时才把那一份说明书搬进上下文。</text>
+      <text x="40" y="244" font-size="13" fill="#1f2328" font-family="sans-serif">脚本是特例：让 Claude「运行」它，比让它「读进去」更省——代码不必进入上下文也能发挥作用。</text>
+    </svg>
+    <figcaption>图 3：Skill 的三级加载。这正是「文件夹」形态的意义——把内容摊在文件系统上，而不是一次性摊在上下文里。</figcaption>
+  </figure>
+
+  <h3>3.3 它解决了 Agent 的什么缺口</h3>
+  <p>Anthropic 在《Equipping agents for the real world with Agent Skills》里给出的判断是：Agent 缺的不是智力，而是<strong>领域专长（expertise）</strong>。他们的原话大意是——报税时你愿意找数学天才从第一性原理推导，还是有经验的老会计？多数人选后者，不是因为后者更聪明，而是因为他有积累下来的经验。</p>
+  <p>Skill 就是把这个「积累下来的经验」打包成 Agent 能读取的形式。与提示词的关键差别：提示词是<strong>对话级的一次性指令</strong>，Skill 是<strong>可复用、按需加载、能被版本管理的文件资源</strong>。</p>
+</section>
+
+<section id="model">
+  <h2>4. 最小心智模型</h2>
+  <div class="card">
+    <p><strong>类比：给新员工准备的入职手册，放在公司书架（文件系统）上。</strong></p>
+    <p>新人入职时不需要背下整本手册。他只需要知道「书架上有哪些手册、各自管什么」；真到要报销时，才去抽《报销流程》那一本翻；手册里附的脚本，他直接跑就行，不必把代码背下来。</p>
+    <p>更关键的是：<strong>手册写一次，所有新人都受益，还能用 Git 版本管理和团队共享。</strong>而提示词相当于每次都在微信里重新打字交代一遍。</p>
+  </div>
+</section>
+
+<section id="mine">
+  <h2>5. 我的理解</h2>
+  <div class="mine">
+    <h3>（本人改写，非 AI 原文）</h3>
+    <p><strong>类比：</strong>Skill 就是把「我第 N 次粘贴进聊天框的那段提示词」，做成一个带说明书的工具箱。区别在于：粘贴的提示词会随会话消失，而工具箱放在文件系统上，谁都能拿、还能改、还能提交到 Git。</p>
+    <p><strong>大白话：</strong>Skill = 一个文件夹 + 一份带 name/description 的 SKILL.md + 可选的脚本和参考资料，模型在觉得相关时自己去翻。</p>
+    <p><strong>它其实不是：</strong></p>
+    <ul>
+      <li>不是「更长的提示词」。本质差别在于<strong>存储位置和加载时机</strong>：提示词活在对话里、一次性；Skill 活在文件系统里、可复用、按需分级加载。</li>
+      <li>不是 MCP 的替代品。我的记法是：<strong>MCP 解决「连不连得上」，Skill 解决「会不会做」</strong>。一个给工具，一个给方法。两者是互补关系，官方文档也说 Skill 可以教 Agent 如何组合使用 MCP 提供的能力。</li>
+      <li>不是「一调用就把全文塞进上下文」。只有元数据常驻；正文命中才读；脚本甚至只运行不读取。这一点是它和「把长指令写进 CLAUDE.md」最大的不同——CLAUDE.md 是常驻的，Skill 不是。</li>
+      <li>不是程序员的专利。文件是通用载体，产品、运营、财务都能把自己的流程写成 Skill。</li>
+    </ul>
+  </div>
+</section>
+
+<section id="scenario">
+  <h2>6. 具体应用场景</h2>
+  <h3>场景：把「生成概念学习资料」这件事固化成本仓库的 Skill</h3>
+  <p>这就是本次作业做的事，也是我能举出的最真实的例子。</p>
+  <table>
+    <tr><th style="width:130px">维度</th><th>内容</th></tr>
+    <tr><td>谁在用</td><td>我自己（以及任何克隆这个仓库、在 WorkBuddy / Claude Code 中打开它的人）</td></tr>
+    <tr><td>具体怎么用</td><td>Skill 放在 <code>.workbuddy/skills/concept-study-guide/</code>，作为<strong>项目级 Skill</strong> 随仓库走；我说「用 concept-study-guide 学一下向量检索」，它就按 SKILL.md 里的十节结构产出一份 HTML</td></tr>
+    <tr><td>为什么非它不可</td><td>如果我每次都重新打字描述「要十节、要来源、要自测题」，既会遗漏也会走样；固化成 Skill 后，<strong>换任何概念都能得到同质量的产出</strong>，而且这份方法论本身可以用 Git 迭代</td></tr>
+    <tr><td>效果怎么衡量</td><td>换一个陌生概念时是否无需修改提示词即可复用；产出资料是否稳定包含全部十节；来源是否都可核查</td></tr>
+  </table>
+  <p>官方给的另一类例子是<strong>品牌规范 Skill</strong>：把公司的配色、字体、Logo 用法和 PPT 模板脚本打包，让 Agent 每次做出来的幻灯片都符合规范——这类「组织知识沉淀」是 Skill 最典型的企业用途。</p>
+</section>
+
+<section id="boundary">
+  <h2>7. 易混淆概念与使用边界</h2>
+  <table>
+    <tr><th style="width:110px">混淆对象</th><th>表面相似点</th><th>本质区别</th><th>判断口诀</th></tr>
+    <tr>
+      <td><strong>Prompt（提示词）</strong></td>
+      <td>内容都是给模型的指令</td>
+      <td>Prompt 是对话级、一次性、每次要重贴；Skill 是文件级、持久、自动发现并按需加载</td>
+      <td>这段指令你会用第二次吗？会就做成 Skill</td>
+    </tr>
+    <tr>
+      <td><strong>MCP</strong></td>
+      <td>都被说成「扩展 Agent 能力」</td>
+      <td>MCP 提供<em>连接与工具</em>（能访问什么系统）；Skill 提供<em>方法与流程</em>（怎么把事做对）</td>
+      <td>是让它「够得着」，还是「会做」？</td>
+    </tr>
+    <tr>
+      <td><strong>CLAUDE.md / 项目说明文件</strong></td>
+      <td>都是项目里的 Markdown，都写约定</td>
+      <td>CLAUDE.md 内容<em>常驻上下文</em>，适合事实型约定（技术栈、目录结构）；Skill 按需加载，适合<em>流程型长内容</em></td>
+      <td>内容是「事实」还是「步骤」？步骤长的放 Skill</td>
+    </tr>
+    <tr>
+      <td><strong>Subagent（子智能体）</strong></td>
+      <td>都涉及任务分工</td>
+      <td>Subagent 是独立上下文的<em>执行者</em>；Skill 是<em>知识包</em>。两者可组合：子智能体也可以加载 Skill</td>
+      <td>是一个「干活的人」还是一本「手册」？</td>
+    </tr>
+    <tr>
+      <td><strong>微调（Fine-tuning）</strong></td>
+      <td>都能让模型在某个领域表现更好</td>
+      <td>微调改变模型权重，成本高、不可逆；Skill 只改变上下文，改一行就生效</td>
+      <td>改的是脑子，还是给的手册？</td>
+    </tr>
+  </table>
+
+  <h3>不该用 Skill 的情况</h3>
+  <ol>
+    <li><strong>一次性任务。</strong>只做一回的事，直接说即可，封装成 Skill 是浪费。</li>
+    <li><strong>一两句话能说清的约定。</strong>这类更适合写进项目说明文件常驻，而不是做成一个按需加载的 Skill。</li>
+    <li><strong>内容依赖实时数据。</strong>Skill 是静态文件，本身不会自动更新；要拿实时信息必须配合工具或 MCP。</li>
+    <li><strong>来源不明的第三方 Skill。</strong>官方明确警告：Skill 可以包含可执行代码，恶意 Skill 可能引入漏洞或导致数据外泄。只从可信来源安装，装前通读它打包的文件。</li>
+    <li><strong>把密钥硬编码进 Skill。</strong>官方安全建议明确列出这一点——敏感信息不应写进 Skill 文件。</li>
+  </ol>
+</section>
+
+<section id="quiz">
+  <h2>8. 自测题（5 题）</h2>
+  <details><summary>Q1（定义）SKILL.md 的 YAML 前置元数据里，name 和 description 分别起什么作用？哪个更关键？</summary>
+    <p><strong>判分要点：</strong>name 是技能标识（也是调用命令名）；description 决定模型判断「何时该用它」。description 更关键——它写不好，Skill 就不会被触发。官方文档明确说模型用 name 和 description 来决定是否响应当前任务。</p></details>
+  <details><summary>Q2（机制）装了 100 个 Skill，为什么上下文不会被撑爆？</summary>
+    <p><strong>判分要点：</strong>启动时只加载每个 Skill 的元数据（约 50–100 tokens）；正文在匹配命中后才读取（建议 < 5k tokens）；附属资源和脚本在被引用时才访问，脚本甚至可以只执行不读入。这就是渐进式披露。</p></details>
+  <details><summary>Q3（机制）为什么 Skill 里放可执行脚本，比把代码写进 Markdown 正文更省上下文？</summary>
+    <p><strong>判分要点：</strong>脚本由模型通过命令<em>执行</em>，代码内容不必进入上下文；而写进正文的代码会被当作 token 读入。同时脚本提供确定性操作，比让模型每次重新生成代码更可靠。</p></details>
+  <details><summary>Q4（边界）你有一段「代码评审检查清单」，该写成 Skill 还是放进项目说明文件？</summary>
+    <p><strong>判分要点：</strong>倾向写成 Skill——它是<em>流程型、内容较长</em>、只在评审时才需要的知识，按需加载更省上下文；项目说明文件适合放常驻的事实型约定。能说出「长且非每次都需要 → Skill」的判断依据即可得分。</p></details>
+  <details><summary>Q5（迁移）挑一件你每周重复做、且每次都要重新交代 AI 的事，描述你会怎么把它写成 Skill（列出目录结构和 description）。</summary>
+    <p><strong>判分要点：</strong>开放题。合格标准：① 目录里至少包含 SKILL.md；② description 里既写了「做什么」也写了「什么时候用」；③ 能说清哪些内容放正文、哪些拆到附属文件。三点齐全为满分。</p></details>
+</section>
+
+<section id="sources">
+  <h2>9. 可核查来源</h2>
+  <table>
+    <tr><th style="width:24%">标题</th><th>链接</th><th style="width:10%">类型</th><th>支撑了哪句话</th><th style="width:8%">已核实</th></tr>
+    <tr>
+      <td>Agent Skills overview（Claude 官方平台文档）</td>
+      <td><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview" target="_blank" rel="noopener">platform.claude.com/docs/en/agents-and-tools/agent-skills/overview</a></td>
+      <td><span class="tag">一手</span></td>
+      <td>Skill 的官方定义；三级加载与各自 token 量级；Skill 与 prompt 的区别；目录结构示例</td>
+      <td>是（2026-09-09 访问，HTTP 200）</td>
+    </tr>
+    <tr>
+      <td>Equipping agents for the real world with Agent Skills（Anthropic 工程博客）</td>
+      <td><a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills" target="_blank" rel="noopener">anthropic.com/engineering/equipping-agents-...</a></td>
+      <td><span class="tag">一手</span></td>
+      <td>「Agent 缺的是专长而非智力」的报税类比；渐进式披露；Skill 开发与安全建议</td>
+      <td>是（2026-09-09 访问，HTTP 200）</td>
+    </tr>
+    <tr>
+      <td>Extend Claude with skills（Claude Code 官方文档）</td>
+      <td><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">code.claude.com/docs/en/skills</a></td>
+      <td><span class="tag">一手</span></td>
+      <td>项目级 Skill 的存放位置与作用域；「正文只在被使用时加载」的表述；name/description 字段规范</td>
+      <td>是（2026-09-09 访问，HTTP 200）</td>
+    </tr>
+    <tr>
+      <td>Introducing Agent Skills（Anthropic 官方博客）</td>
+      <td><a href="https://www.claude.com/blog/skills" target="_blank" rel="noopener">claude.com/blog/skills</a></td>
+      <td><span class="tag">一手</span></td>
+      <td>Skill 的可组合、可移植、高效、可执行代码四个特性；Skill 与 MCP 的互补关系</td>
+      <td>是（2026-09-09 访问，HTTP 200）</td>
+    </tr>
+  </table>
+</section>
+
+<section id="doubt">
+  <h2>10. 我的存疑点</h2>
+  <div class="doubt">
+    <ul>
+      <li><strong>触发完全依赖 description 的语义匹配，这点我觉得是最大隐患。</strong>官方文档也承认，如果 description 写得不好，Skill 就不会被调用，而开发者很难预判模型会怎么匹配。实践中我的应对是把「用户可能怎么开口」的原话写进 description（比如本 Skill 里就写进了「用这个 Skill 学 XX」这类说法），但这仍是经验而非方法。</li>
+      <li><strong>「该拆成几个小 Skill 还是一个大的」，标准模糊。</strong>官方建议「保持专注、为不同工作流创建单独的 Skill」，但也说多个 Skill 可以自动组合。我的判断是：按「是否会被同时用到」来划分——会同时用到的放一起，互斥的拆开。但这条是我自己归纳的，没有官方文档背书。</li>
+      <li><strong>Skill 的「版本管理」目前比较原始。</strong>它本质是文件夹，改了就改了，缺少依赖声明和兼容性检查（官方只提供了可选的 dependencies 字段）。这对团队协作是个隐患。</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  生成工具：concept-study-guide（本人自建的项目级 Skill，位于 <code>.workbuddy/skills/concept-study-guide/</code>）<br>
+  流程：AI 初稿 → 本人逐条核对来源链接 → 改写「我的理解」与「存疑点」 → 定稿
+</footer>
+
+</div>
+</body>
+</html>

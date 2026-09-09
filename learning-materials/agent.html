@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>概念学习资料：Agent（智能体）</title>
+<style>
+  :root{
+    --bg:#ffffff; --card:#f7f8fa; --primary:#2c5aa0; --primary-soft:#eaf0f9;
+    --text:#1f2328; --muted:#57606a; --border:#d8dee4; --warn:#b35900; --warn-bg:#fff8e6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    font-size:15.5px;line-height:1.75;}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 24px 80px;}
+  header.top{border-bottom:3px solid var(--primary);padding-bottom:18px;margin-bottom:8px;}
+  h1{font-size:27px;margin:0 0 10px;color:var(--primary);}
+  .def{font-size:17px;background:var(--primary-soft);border-left:4px solid var(--primary);
+    padding:12px 16px;border-radius:0 6px 6px 0;margin:10px 0 0;}
+  .notice{background:var(--warn-bg);border:1px solid #f0d8a8;border-radius:6px;
+    padding:10px 14px;font-size:14px;color:var(--warn);margin:18px 0;}
+  nav.toc{background:var(--card);border:1px solid var(--border);border-radius:8px;
+    padding:14px 18px;margin:22px 0 30px;}
+  nav.toc strong{color:var(--primary);}
+  nav.toc a{color:var(--text);text-decoration:none;margin:0 10px 0 0;font-size:14px;white-space:nowrap;}
+  nav.toc a:hover{color:var(--primary);text-decoration:underline;}
+  section{margin:0 0 34px;}
+  h2{font-size:20px;color:var(--primary);border-bottom:1px solid var(--border);
+    padding-bottom:8px;margin:38px 0 14px;}
+  h3{font-size:16px;margin:20px 0 8px;}
+  p{margin:10px 0;}
+  ul,ol{margin:10px 0;padding-left:24px;}
+  li{margin:6px 0;}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px;}
+  th{background:var(--primary-soft);color:var(--primary);text-align:left;
+    padding:9px 11px;border:1px solid var(--border);font-weight:600;}
+  td{padding:9px 11px;border:1px solid var(--border);vertical-align:top;}
+  tr:nth-child(even) td{background:#fcfcfd;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin:14px 0;}
+  .mine{background:#f0f7f0;border-left:4px solid #2f7a3e;border-radius:0 8px 8px 0;padding:14px 18px;margin:14px 0;}
+  .mine h3{margin-top:0;color:#2f7a3e;}
+  code{background:#eef1f4;padding:2px 6px;border-radius:4px;font-size:13.5px;
+    font-family:"SFMono-Regular",Consolas,monospace;}
+  a{color:var(--primary);text-decoration:underline;}
+  figure{margin:16px 0;text-align:center;}
+  figcaption{font-size:13px;color:var(--muted);margin-top:8px;}
+  details{background:var(--card);border:1px solid var(--border);border-radius:6px;
+    padding:10px 14px;margin:8px 0;}
+  summary{cursor:pointer;font-weight:600;}
+  .tag{display:inline-block;background:var(--primary-soft);color:var(--primary);
+    border-radius:4px;padding:1px 8px;font-size:12.5px;margin-right:6px;}
+  .doubt{background:#fdf3f3;border-left:4px solid #c0392b;border-radius:0 8px 8px 0;padding:14px 18px;}
+  footer{margin-top:50px;padding-top:16px;border-top:1px solid var(--border);
+    font-size:13.5px;color:var(--muted);}
+  @media print{nav.toc{display:none}details{display:block}
+    details summary{display:none}body{font-size:12pt}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>Agent（智能体）</h1>
+  <p class="def">一句话定义：把大模型放进一个「思考—调用工具—看结果—再思考」的循环里，让它自己决定怎么把一件事做完。</p>
+</header>
+
+<p class="notice">本资料由 AI 生成初稿，经本人逐条核查与改写后定稿。所有来源链接均已实际访问确认。核查与修改记录见仓库 README。</p>
+
+<nav class="toc">
+  <strong>目录：</strong>
+  <a href="#card">档案卡</a><a href="#goal">学习目标</a><a href="#question">核心问题</a>
+  <a href="#mechanism">核心机制</a><a href="#model">心智模型</a><a href="#mine">我的理解</a>
+  <a href="#scenario">应用场景</a><a href="#boundary">易混淆与边界</a>
+  <a href="#quiz">自测</a><a href="#sources">来源</a><a href="#doubt">存疑点</a>
+</nav>
+
+<section id="card">
+  <h2>学习档案卡</h2>
+  <table>
+    <tr><th style="width:120px">概念</th><td>Agent（智能体 / AI Agent）</td></tr>
+    <tr><th>所属领域</th><td>大模型应用架构（LLM Application Architecture）</td></tr>
+    <tr><th>我的起点</th><td>用过对话式 AI 和 Copilot 类工具，能写 prompt，但不清楚「Agent」和普通对话究竟差在哪一层</td></tr>
+    <tr><th>学习深度</th><td>标准</td></tr>
+    <tr><th>预计耗时</th><td>45 分钟（含自测）</td></tr>
+    <tr><th>生成日期</th><td>2026-09-09</td></tr>
+  </table>
+</section>
+
+<section id="goal">
+  <h2>1. 学习目标</h2>
+  <ol>
+    <li>能区分 Workflow 和 Agent，并说清判断依据是「控制权在代码还是在模型」。</li>
+    <li>能画出 Agent 的基本运行循环，并标出每一步输入了什么、输出了什么。</li>
+    <li>能判断一个具体任务该不该上 Agent，并给出至少两条反对或支持的理由。</li>
+  </ol>
+</section>
+
+<section id="question">
+  <h2>2. 核心问题</h2>
+  <ul>
+    <li>Agent 和普通「大模型对话」的本质差别，是模型变强了，还是系统结构变了？</li>
+    <li>为什么 Anthropic 强调 Agent 每一步都要从环境里拿到 ground truth？拿不到会怎样？</li>
+    <li>什么情况下「上 Agent」是过度设计？</li>
+  </ul>
+</section>
+
+<section id="mechanism">
+  <h2>3. 核心机制与组成</h2>
+
+  <p>Anthropic 在工程博客《Building effective agents》里给了一个很克制但很关键的定义：他们把所有这类系统统称 <strong>agentic systems</strong>，然后在其中划出一条架构上的分界线——</p>
+  <ul>
+    <li><strong>Workflow（工作流）</strong>：LLM 和工具通过<em>预先写好的代码路径</em>编排，每一步做什么由开发者定死。</li>
+    <li><strong>Agent（智能体）</strong>：LLM <em>自己动态决定</em>执行流程和工具用法，掌控任务如何完成。</li>
+  </ul>
+
+  <p>所以 Agent 的「组成」可以拆成五块：</p>
+  <table>
+    <tr><th style="width:130px">组成部分</th><th>作用</th><th>缺了会怎样</th></tr>
+    <tr><td><strong>模型（大脑）</strong></td><td>做判断：下一步干什么、用哪个工具、够不够格交差</td><td>退化为固定脚本</td></tr>
+    <tr><td><strong>工具（手脚）</strong></td><td>读文件、跑代码、搜网页、调 API，让模型能影响外部世界</td><td>只能「说」不能「做」</td></tr>
+    <tr><td><strong>环境反馈（感官）</strong></td><td>工具返回的结果、报错、测试通过与否，即所谓 ground truth</td><td>模型陷入自我想象，无法纠错</td></tr>
+    <tr><td><strong>循环（生命力）</strong></td><td>把上面三件事串起来反复执行，直到达成目标</td><td>退回单轮问答</td></tr>
+    <tr><td><strong>停止条件（刹车）</strong></td><td>最大迭代次数、人工检查点、护栏</td><td>成本失控、错误复合放大</td></tr>
+  </table>
+
+  <figure>
+    <svg viewBox="0 0 880 300" width="100%" role="img" aria-label="Agent 运行循环示意图">
+      <defs>
+        <marker id="ar" markerWidth="10" markerHeight="10" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#2c5aa0"/>
+        </marker>
+      </defs>
+      <rect x="10" y="40" width="150" height="60" rx="8" fill="#eaf0f9" stroke="#2c5aa0" stroke-width="1.5"/>
+      <text x="85" y="66" text-anchor="middle" font-size="14" fill="#1f2328" font-family="sans-serif">① 接收目标</text>
+      <text x="85" y="86" text-anchor="middle" font-size="12" fill="#57606a" font-family="sans-serif">用户指令 + 可用工具</text>
+
+      <rect x="190" y="40" width="150" height="60" rx="8" fill="#eaf0f9" stroke="#2c5aa0" stroke-width="1.5"/>
+      <text x="265" y="66" text-anchor="middle" font-size="14" fill="#1f2328" font-family="sans-serif">② 模型思考决策</text>
+      <text x="265" y="86" text-anchor="middle" font-size="12" fill="#57606a" font-family="sans-serif">规划 / 选工具</text>
+
+      <rect x="370" y="40" width="150" height="60" rx="8" fill="#eaf0f9" stroke="#2c5aa0" stroke-width="1.5"/>
+      <text x="445" y="66" text-anchor="middle" font-size="14" fill="#1f2328" font-family="sans-serif">③ 调用工具执行</text>
+      <text x="445" y="86" text-anchor="middle" font-size="12" fill="#57606a" font-family="sans-serif">读 / 写 / 跑代码</text>
+
+      <rect x="550" y="40" width="150" height="60" rx="8" fill="#fff8e6" stroke="#b35900" stroke-width="1.5"/>
+      <text x="625" y="66" text-anchor="middle" font-size="14" fill="#1f2328" font-family="sans-serif">④ 环境返回反馈</text>
+      <text x="625" y="86" text-anchor="middle" font-size="12" fill="#b35900" font-family="sans-serif">ground truth</text>
+
+      <rect x="730" y="40" width="140" height="60" rx="8" fill="#eaf0f9" stroke="#2c5aa0" stroke-width="1.5"/>
+      <text x="800" y="66" text-anchor="middle" font-size="14" fill="#1f2328" font-family="sans-serif">⑤ 评估是否完成</text>
+      <text x="800" y="86" text-anchor="middle" font-size="12" fill="#57606a" font-family="sans-serif">达标？还是继续？</text>
+
+      <line x1="160" y1="70" x2="185" y2="70" stroke="#2c5aa0" stroke-width="2" marker-end="url(#ar)"/>
+      <line x1="340" y1="70" x2="365" y2="70" stroke="#2c5aa0" stroke-width="2" marker-end="url(#ar)"/>
+      <line x1="520" y1="70" x2="545" y2="70" stroke="#2c5aa0" stroke-width="2" marker-end="url(#ar)"/>
+      <line x1="700" y1="70" x2="725" y2="70" stroke="#2c5aa0" stroke-width="2" marker-end="url(#ar)"/>
+
+      <path d="M 800 100 L 800 180 L 265 180 L 265 105" fill="none" stroke="#2c5aa0"
+            stroke-width="2" stroke-dasharray="6,4" marker-end="url(#ar)"/>
+      <text x="530" y="200" text-anchor="middle" font-size="13" fill="#2c5aa0" font-family="sans-serif">未完成 → 带着新结果回到第②步（循环）</text>
+
+      <rect x="730" y="215" width="140" height="46" rx="8" fill="#f0f7f0" stroke="#2f7a3e" stroke-width="1.5"/>
+      <text x="800" y="242" text-anchor="middle" font-size="14" fill="#1f2328" font-family="sans-serif">⑥ 输出最终结果</text>
+      <line x1="800" y1="100" x2="800" y2="210" stroke="#2f7a3e" stroke-width="2" marker-end="url(#ar)"/>
+      <text x="812" y="160" font-size="12" fill="#2f7a3e" font-family="sans-serif">达标</text>
+    </svg>
+    <figcaption>图 1：Agent 的基本运行循环。关键在第 ④ 步——模型必须拿到环境返回的真实结果，否则循环失去纠错能力。</figcaption>
+  </figure>
+
+  <p>用一行伪代码概括就是：</p>
+  <div class="card"><code>while not done: 思考 → 选工具 → 执行 → 观察结果 → 更新判断</code></div>
+  <p>Anthropic 特别提醒：Agent 的自主性带来更高成本，也带来<strong>错误复合</strong>（compounding errors）的风险，所以建议先在沙盒里充分测试并配好护栏。</p>
+</section>
+
+<section id="model">
+  <h2>4. 最小心智模型</h2>
+  <div class="card">
+    <p><strong>类比：一个带着工具箱、可以随时来问你的实习生。</strong></p>
+    <p>你交代目标（「帮我把这批笔记整理成网页」），他不会一步到位，而是先列个待办，动手做一段，看看做出来的东西对不对，不对就改，中途拿不准会回头问你，做完了把结果交给你验收。</p>
+    <p>普通对话式 AI 更像<strong>你问他一句他答一句的顾问</strong>——不主动开工，也不对结果负责。这个差别不在智商，而在「他被允许反复动手并根据结果调整」。</p>
+  </div>
+</section>
+
+<section id="mine">
+  <h2>5. 我的理解</h2>
+  <div class="mine">
+    <h3>（本人改写，非 AI 原文）</h3>
+    <p><strong>类比：</strong>Agent 不是「更大的大脑」，而是「给同一个大脑配了手、眼睛和重试的机会」。就像同一个厨师，站在只能说话的咨询窗口前，和站在能自己开火、尝味、重做的灶台前，产出完全不是一回事。</p>
+    <p><strong>大白话：</strong>Agent = 大模型 + 工具 + 循环 + 环境反馈。四个要素缺一个都不成立；其中「循环」和「反馈」最容易被忽略，但它们才是让模型从「会说」变成「会做」的关键。</p>
+    <p><strong>它其实不是：</strong></p>
+    <ul>
+      <li>不是「更聪明的模型」。底层模型没换，换的是系统结构。同一代模型，套上循环和工具就能做单轮做不到的事。</li>
+      <li>不是「给它一句话它就能全自动搞定」。它需要在关键节点拿 ground truth，也需要停止条件和人工检查点，否则会一直转圈或越错越远。</li>
+      <li>不是「越自主越好」。Anthropic 的原话是：只在复杂度能被证明带来收益时才加复杂度。我认同这点——能用固定流程解决的，硬上 Agent 是给自己找麻烦。</li>
+    </ul>
+  </div>
+</section>
+
+<section id="scenario">
+  <h2>6. 具体应用场景</h2>
+  <h3>场景：按一个 issue 描述，自动修改代码仓库并通过测试</h3>
+  <p>这是 Anthropic 在文中明确列举的 Agent 用例：处理 SWE-bench 类任务，即根据任务描述修改多个文件。</p>
+  <table>
+    <tr><th style="width:130px">维度</th><th>内容</th></tr>
+    <tr><td>谁在用</td><td>开发者、以及各类 coding Agent 产品</td></tr>
+    <tr><td>具体怎么用</td><td>给出 issue → Agent 自己定位相关文件 → 改代码 → 跑测试 → 看报错 → 继续改 → 全绿后提交</td></tr>
+    <tr><td>为什么非它不可</td><td><strong>改几个文件、要改几轮，事先无法预知</strong>，没法写死一条固定流程；而测试结果提供了明确的 ground truth，让每一步都能被验证</td></tr>
+    <tr><td>效果怎么衡量</td><td>任务完成率、平均迭代轮数、token 成本、引入新 bug 的比例</td></tr>
+  </table>
+  <p><strong>我自己的一个实例：</strong>这次作业里，我让 WorkBuddy 帮我建仓库、写文件、跑 git 命令。它之所以能做，正是因为它有文件系统和命令行这两个「工具」，并且能看到每次命令的输出（比如端口被拒、命令不存在）来调整下一步——换成纯聊天窗口，它只能告诉我「你可以执行 git init」，而做不了。</p>
+</section>
+
+<section id="boundary">
+  <h2>7. 易混淆概念与使用边界</h2>
+  <table>
+    <tr><th style="width:110px">混淆对象</th><th>表面相似点</th><th>本质区别</th><th>判断口诀</th></tr>
+    <tr>
+      <td><strong>Workflow</strong></td>
+      <td>都在调 LLM、都在用工具、都能完成多步骤任务</td>
+      <td>Workflow 的步骤是开发者<em>写死</em>的；Agent 的步骤是模型<em>临场决定</em>的</td>
+      <td>问一句：这一步是代码让它做的，还是它自己选的？</td>
+    </tr>
+    <tr>
+      <td><strong>普通 Chatbot</strong></td>
+      <td>底层都是同一个大模型</td>
+      <td>Chatbot 一轮结束就交卷，不调用工具改变外部状态，也不根据执行结果自我修正</td>
+      <td>它有没有「动手」并「看结果」？没有就是对话</td>
+    </tr>
+    <tr>
+      <td><strong>脚本 / RPA</strong></td>
+      <td>都能自动化完成任务</td>
+      <td>脚本靠规则处理可枚举的情况；Agent 处理的是开放、无法穷举路径的问题</td>
+      <td>能不能用 if-else 写清楚所有分支？能就别用 Agent</td>
+    </tr>
+    <tr>
+      <td><strong>「更强的模型」</strong></td>
+      <td>表现都变好了</td>
+      <td>换模型提升的是单次推理质量；做 Agent 提升的是任务完成的结构能力</td>
+      <td>变强的是脑子，还是工作方式？</td>
+    </tr>
+  </table>
+
+  <h3>不该用 Agent 的情况</h3>
+  <ol>
+    <li><strong>任务路径可预测</strong>：能写成固定流程的，用 Workflow 或直接写脚本，更便宜也更可控。</li>
+    <li><strong>结果无法验证</strong>：如果没有测试、没有客观反馈，Agent 就失去了纠错的锚点，错误会一路复合。</li>
+    <li><strong>对可靠性要求极高且不允许人工介入</strong>：如无人值守的资金操作，自主性带来的不确定性难以接受。</li>
+    <li><strong>成本敏感的简单任务</strong>：Agent 自主意味着多轮推理，token 消耗远高于单次调用。</li>
+  </ol>
+</section>
+
+<section id="quiz">
+  <h2>8. 自测题（5 题）</h2>
+  <details><summary>Q1（定义）用一句话说清 Agent 和 Workflow 的区别。</summary>
+    <p><strong>判分要点：</strong>必须点出「控制权归属」——Workflow 由预定义代码路径编排，Agent 由 LLM 动态决定自己的流程和工具使用。只答「Agent 更智能/更自主」不给满分，因为没有说清差异的结构性来源。</p></details>
+  <details><summary>Q2（机制）Agent 循环里，「环境反馈」这一步如果被拿掉，会发生什么？为什么？</summary>
+    <p><strong>判分要点：</strong>模型失去 ground truth，无法判断自己上一步做得对不对，只能凭自己的输出继续推理，于是错误不断累积（compounding errors），且可能陷入无效的自我循环。提到「无法纠错」「错误复合」任一即可得分。</p></details>
+  <details><summary>Q3（机制）为什么 Anthropic 建议给 Agent 设置最大迭代次数这类停止条件？</summary>
+    <p><strong>判分要点：</strong>自主性带来两个副作用——成本随轮数线性上升、错误可能复合放大；停止条件和检查点是为了「维持控制」（maintain control）。</p></details>
+  <details><summary>Q4（边界）团队想用 Agent 自动处理「每月固定的报表格式转换」，你会支持吗？</summary>
+    <p><strong>判分要点：</strong>倾向不支持。因为路径固定、规则明确，属于 Workflow 或脚本的适用场景；上 Agent 会引入不确定性和额外成本。能说出「能用 if-else 写清就不用 Agent」这句判断标准即可。</p></details>
+  <details><summary>Q5（迁移）把「判断该不该用 Agent」的标准，套用到你自己的一个真实任务上，说明结论。</summary>
+    <p><strong>判分要点：</strong>开放式答案。合格标准是要明确列出：这个任务的步数是否可预知、有没有客观的成功判据、出错代价多大——三个维度中至少两个被讨论到。</p></details>
+</section>
+
+<section id="sources">
+  <h2>9. 可核查来源</h2>
+  <table>
+    <tr><th style="width:26%">标题</th><th>链接</th><th style="width:10%">类型</th><th>支撑了哪句话</th><th style="width:8%">已核实</th></tr>
+    <tr>
+      <td>Building effective agents（Anthropic 工程博客）</td>
+      <td><a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">anthropic.com/engineering/building-effective-agents</a></td>
+      <td><span class="tag">一手</span></td>
+      <td>Workflow 与 Agent 的架构区分；「LLM 动态主导自身流程」的定义；ground truth、停止条件、错误复合、SWE-bench 用例</td>
+      <td>是（2026-09-09 访问，HTTP 200）</td>
+    </tr>
+    <tr>
+      <td>LLM Powered Autonomous Agents（Lil'Log, Lilian Weng）</td>
+      <td><a href="https://lilianweng.github.io/posts/2023-06-23-agent/" target="_blank" rel="noopener">lilianweng.github.io/posts/2023-06-23-agent</a></td>
+      <td><span class="tag">二手综述</span></td>
+      <td>Agent = 模型 + 工具 + 循环的经典结构划分（ Planning / Tool use / Memory 三分法）</td>
+      <td>是（2026-09-09 访问，HTTP 200）</td>
+    </tr>
+    <tr>
+      <td>Equipping agents for the real world with Agent Skills</td>
+      <td><a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills" target="_blank" rel="noopener">anthropic.com/engineering/equipping-agents-...</a></td>
+      <td><span class="tag">一手</span></td>
+      <td>Agent 缺的是「领域专长」而非通用能力的论断</td>
+      <td>是（2026-09-09 访问，HTTP 200）</td>
+    </tr>
+    <tr>
+      <td>Model Context Protocol 官网</td>
+      <td><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">modelcontextprotocol.io</a></td>
+      <td><span class="tag">一手</span></td>
+      <td>工具接入的标准化协议，对应组成表中的「工具」一项</td>
+      <td>是（2026-09-09 访问，HTTP 200）</td>
+    </tr>
+  </table>
+</section>
+
+<section id="doubt">
+  <h2>10. 我的存疑点</h2>
+  <div class="doubt">
+    <ul>
+      <li><strong>Workflow 和 Agent 的边界在真实产品里是模糊的。</strong>市面上的 Agent 产品大多是两者的混合体：外层有固定编排，某些节点交给模型自由发挥。Anthropic 自己也把它们合称 agentic systems。所以我认为这个二分法更适合作为「设计时的思考工具」，而不是给产品贴标签的分类标准。</li>
+      <li><strong>「自主到什么程度才算 Agent」没有公认刻度。</strong>能调用 1 个工具和能调用 50 个工具、能跑 3 轮和能跑 300 轮，都叫 Agent。评价一个系统时，我觉得更有意义的问题是「它的自主度是否与任务的不可预测性相匹配」。</li>
+      <li>文中提到自主性带来「复合错误」，但没给出量化的失效阈值。我暂时不知道多少轮之后错误率会显著上升，这可能高度依赖任务类型。</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  生成工具：concept-study-guide（本人自建的项目级 Skill，位于 <code>.workbuddy/skills/concept-study-guide/</code>）<br>
+  流程：AI 初稿 → 本人逐条核对来源链接 → 改写「我的理解」与「存疑点」 → 定稿
+</footer>
+
+</div>
+</body>
+</html>
